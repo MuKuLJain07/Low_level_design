@@ -71,28 +71,27 @@ class seller:
 
     def get_sellerId(self):
         return self.__sellerId
-
+        
     def get_productList(self):
         return self.__productList
 
     def get_serviceablePincodes(self):
         return self.__serviceablePincodes
-
+        
     def get_paymentModes(self):
         return self.__paymentModes
-
+        
     def set_productList(self, productId, quantity):
         for product in self.__productList:
-            if product.get_productId() == productId:
-                product.set_quantity(product.get_quantity() + quantity)
-                return
-        print("Product not found in seller's inventory")
+            if(product.get_productId() == productId):
+                product.set_quantity(quantity)
 
     def set_serviceablePincodes(self, newServiceablePincodes):
         self.__serviceablePincodes = newServiceablePincodes
-
+        
     def set_paymentModes(self, newPaymentModes):
         self.__paymentModes = newPaymentModes
+    
 
 
 class product:
@@ -102,12 +101,12 @@ class product:
 
     def get_productId(self):
         return self.__productId
-
+    
     def get_quantity(self):
         return self.__quantity
-
+    
     def set_quantity(self, newQuantity):
-        if newQuantity >= 0:
+        if(newQuantity >= 0):
             self.__quantity = newQuantity
         else:
             print("Invalid Quantity Provided")
@@ -116,24 +115,37 @@ class product:
 class marketplace:
     def __init__(self, sellerIDs):
         self.__sellerIds = sellerIDs
-
+    
     def addInventory(self, productId, sellerId, delta):
         for seller in self.__sellerIds:
             if seller.get_sellerId() == sellerId:
                 seller.set_productList(productId, delta)
                 print("Item added to the inventory")
                 return
+        
         print("Seller not found")
 
     def getInventory(self, sellerId, productId):
+        '''
+        return the number of product available in the inventory
+        '''
         for seller in self.__sellerIds:
             if seller.get_sellerId() == sellerId:
                 for product in seller.get_productList():
                     if product.get_productId() == productId:
                         return product.get_quantity()
-        return 0
+        
+        print("Oops!! product not found!!")
+        return
+
 
     def createOrder(self, orderId, destinationPincode, sellerId, productId, productCount, paymentMode):
+        '''
+        creates order with orderId and reduces product inventory from seller by productCount
+
+        returns (in that order) : "order placed" or "pincode unserviceable" or "payment mode not supported" or "insufficient product inventory"
+        '''
+
         for seller in self.__sellerIds:
             if seller.get_sellerId() == sellerId:
                 if destinationPincode not in seller.get_serviceablePincodes():
@@ -142,7 +154,8 @@ class marketplace:
                 if paymentMode not in seller.get_paymentModes():
                     print("payment mode not supported")
                     return 0
-
+                
+                # check inventory
                 for product in seller.get_productList():
                     if product.get_productId() == productId:
                         if product.get_quantity() >= productCount:
@@ -152,14 +165,17 @@ class marketplace:
                         else:
                             print("insufficient product inventory")
                             return 0
-
+                        
+                
                 print("Product Not Found")
                 return 0
         print("Seller not found")
         return 0
-
+                    
+                
 
 if __name__ == "__main__":
+
     # defining products
     product1 = product(0, 0)
     product2 = product(1, 0)
@@ -168,16 +184,22 @@ if __name__ == "__main__":
     product5 = product(4, 0)
     product6 = product(5, 0)
 
+    
     # creating seller
     Seller_0 = seller("seller-0", [product1, product2, product3], {110001, 560092, 452001, 700001}, {"netbanking", "cash", "upi"})
-    Seller_1 = seller("seller-1", [product1, product4, product5, product6], {400050, 110001, 600032, 560092}, {"netbanking", "cash", "upi"})
+    Seller_1 = seller("seller-1", [product1, product5, product6], {400050, 110001, 600032, 560092}, {"netbanking", "cash", "upi"})
 
+    # Addind sellers to the marketplace
     marketA = marketplace([Seller_0, Seller_1])
 
+    # Adding inventory
     marketA.addInventory(0, "seller-1", 52)
     marketA.addInventory(0, "seller-0", 32)
 
+    # Ordering Item
     marketA.createOrder("order-1", 400050, "seller-1", 0, 5, "upi")
-    print("Current available items: ", marketA.getInventory("seller-1", 0))
+    print("Current availavble items : ", marketA.getInventory(0, "seller-1"))
 
+    marketA.createOrder("order-2", 560092, "seller-0", 0, 1, "upi")
+    print("Current availavble items : ", marketA.getInventory(0, "seller-0"))
 
