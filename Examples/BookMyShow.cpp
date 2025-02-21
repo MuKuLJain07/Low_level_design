@@ -108,7 +108,7 @@ obj.getFreeSeatsCount(showId = 1) returned 50
 #include <vector>
 using namespace std;
 
-class cinema{
+class Cinema{
     private:
     int cinemaId;
     int screenCount;
@@ -118,7 +118,7 @@ class cinema{
     map<int, vector<vector<string> > > movies;    // screenIndex - showId, movieId,startTime,endTime
 
     public:
-    cinema(int cinemaId, int screenCount, int screenRow, int screenColumn){
+    Cinema(int cinemaId, int screenCount, int screenRow, int screenColumn){
         this->cinemaId = cinemaId;
         this->screenCount = screenCount;
         this->screenRow = screenRow;
@@ -153,7 +153,7 @@ class cinema{
 
 class Solution{
     private:
-    map<int, vector<cinema*> > cinemaCity;     // cityId, [class cinema] 
+    map<int, vector<Cinema*> > cinemaCity;     // cityId, [class Cinema] 
 
     public:
     Solution(){
@@ -176,13 +176,13 @@ class Solution{
                         return;
                     }
                 }
-                cinema* newCinema = new cinema(cinemaId, screenCount, screenRow, screenColumn);
+                Cinema* newCinema = new Cinema(cinemaId, screenCount, screenRow, screenColumn);
                 cinemaCity[storedCityId.first].push_back(newCinema);
             }
         }
         if(!cityFound){
-            cinema* newCinema = new cinema(cinemaId, screenCount, screenRow, screenColumn);
-            vector<cinema*> temp;
+            Cinema* newCinema = new Cinema(cinemaId, screenCount, screenRow, screenColumn);
+            vector<Cinema*> temp;
             temp.push_back(newCinema);
             cinemaCity[cityId] = temp;
         }
